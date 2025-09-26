@@ -218,9 +218,37 @@
             document.body.insertAdjacentHTML('beforeend', alertHtml);
         }
 
+        function showPointsAlert() {
+            // Crear modal especial para puntos insuficientes
+            const alertHtml = `
+                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div class="bg-white rounded-2xl p-6 max-w-sm w-full">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">⚠️</div>
+                            <p class="text-gray-800 mb-6">Necesitas completar mínimo 4 puntos.</p>
+                            <div class="space-y-3">
+                                <button onclick="closeAlert()" class="w-full bg-blue-500 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 transition-colors">
+                                    ¡Selecciona más retos!
+                                </button>
+                                <button onclick="forceExportProgress()" class="w-full bg-green-500 text-white py-3 rounded-xl font-semibold hover:bg-green-600 transition-colors">
+                                    Voy a completar mis puntos restantes la siguiente semana
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', alertHtml);
+        }
+
         function closeAlert() {
             const alert = document.querySelector('.fixed.inset-0');
             if (alert) alert.remove();
+        }
+
+        function forceExportProgress() {
+            closeAlert();
+            performExport();
         }
 
         function exportProgress() {
@@ -230,10 +258,14 @@
             }
 
             if (getTotalPoints() < 4) {
-                showAlert("Necesitas completar mínimo 4 puntos. ¡Selecciona más retos!");
+                showPointsAlert();
                 return;
             }
 
+            performExport();
+        }
+
+        function performExport() {
             const completedCards = state.completedChallenges.map(card => ({
                 name: card.name,
                 track: card.track,
